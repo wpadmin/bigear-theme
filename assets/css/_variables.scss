@@ -1,0 +1,53 @@
+// Переопределение переменных Bootstrap
+$primary: #FF5500; // Ваш основной цвет
+$secondary: #434BB8; // Ваш вторичный цвет
+
+// Переопределение переменных Bootstrap для заголовков
+$headings-font-family: 'Great Vibes', cursive;
+
+// Индивидуальная настройка для каждого уровня заголовка (опционально)
+$h1-font-size: 2.5rem;
+$h2-font-size: 2rem;
+$h3-font-size: 1.75rem;
+$h4-font-size: 1.5rem;
+$h5-font-size: 1.25rem;
+$h6-font-size: 1rem;
+
+// После переопределения переменных импортируем Bootstrap
+@import "bootstrap/scss/bootstrap";
+
+// Дополнительные настройки шрифта, если нужны более тонкие изменения
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Great Vibes', cursive;
+  font-weight: normal;
+  // Дополнительные настройки для более красивого отображения декоративного шрифта
+  letter-spacing: 0.02em;
+
+  // Обеспечиваем читаемость декоративного шрифта на малых размерах
+  &.small {
+    letter-spacing: 0.01em;
+  }
+}
+
+// Дополнительные классы-помощники
+.text-great-vibes {
+  font-family: 'Great Vibes', cursive;
+}
+
+// Отзывчивые настройки размера шрифта для разных экранов
+@include media-breakpoint-down(md) {
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+  }
+
+  // и т.д. для других заголовков
+}

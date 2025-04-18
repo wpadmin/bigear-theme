@@ -1,0 +1,44 @@
+// _typography.scss
+
+// Декларация шрифта Great Vibes
+@mixin font-great-vibes {
+  font-family: 'Great Vibes', cursive;
+  font-weight: normal;
+  letter-spacing: 0.02em;
+}
+
+// Применяем миксин к заголовкам
+h1, h2, h3, .heading {
+  @include font-great-vibes;
+}
+
+// Специальные настройки для разных заголовков
+h1 {
+  @include font-great-vibes;
+  margin-bottom: 1.2rem;
+
+  @include media-breakpoint-down(sm) {
+    font-size: 2rem;
+  }
+}
+
+h2 {
+  @include font-great-vibes;
+  margin-bottom: 1rem;
+
+  @include media-breakpoint-down(sm) {
+    font-size: 1.75rem;
+  }
+}
+
+// Класс-помощник для применения шрифта к любому элементу
+.great-vibes {
+  @include font-great-vibes;
+}
+
+// Дополнительные типографические настройки для контентных блоков
+.entry-title,
+.widget-title,
+.site-title {
+  @include font-great-vibes;
+}

@@ -1,0 +1,32 @@
+name: Deploy WordPress Theme
+
+on:
+  push:
+    branches:
+      - main  # или master, в зависимости от названия вашей основной ветки
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Setup known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        run: |
+          rsync -avz --delete \
+            --exclude=".git/" \
+            --exclude=".github/" \
+            --exclude="README.md" \
+            --exclude=".gitignore" \
+            ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.THEME_PATH }}
