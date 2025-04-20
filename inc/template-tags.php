@@ -81,13 +81,13 @@ function bigear_entry_footer() {
         
         // Серия книг
         $book_series = get_the_term_list(get_the_ID(), 'book_series', '', esc_html_x(', ', 'list item separator', 'bigear'));
-        if ($book_series) {
-            echo '<div class="meta-item mb-2">';
-            echo '<span class="meta-label badge bg-info text-dark me-2">Серия</span>';
-            echo '<span class="meta-value">' . $book_series . '</span>';
-            echo '</div>';
-        }
-        
+		if (!is_wp_error($book_series) && $book_series) {
+			echo '<div class="meta-item mb-2">';
+			echo '<span class="meta-label badge bg-info text-dark me-2">Серия</span>';
+			echo '<span class="meta-value">' . $book_series . '</span>';
+			echo '</div>';
+		}
+				
         echo '</div>'; // .card-meta
     }
 
