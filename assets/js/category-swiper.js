@@ -24,6 +24,12 @@
                     prevEl: `#${swiperId} .swiper-button-prev`,
                 },
                 breakpoints: {
+                    // когда ширина окна >= 480px
+                    480: {
+                        slidesPerView: 1,
+                        spaceBetween: 10
+                    },
+
                     // когда ширина окна >= 640px
                     640: {
                         slidesPerView: 2,
@@ -31,19 +37,14 @@
                     },
                     // когда ширина окна >= 768px
                     768: {
-                        slidesPerView: 3,
+                        slidesPerView: 2,
                         spaceBetween: 15
                     },
                     // когда ширина окна >= 1024px
                     1024: {
-                        slidesPerView: 4,
+                        slidesPerView: 3,
                         spaceBetween: 20
                     },
-                    // когда ширина окна >= 1280px
-                    1280: {
-                        slidesPerView: 6,
-                        spaceBetween: 20
-                    }
                 },
                 on: {
                     // Когда дошли до конца слайдов
@@ -100,29 +101,46 @@
                             response.data.slides.forEach(function (slide) {
                                 let thumbnailHtml = '';
                                 if (slide.thumbnail) {
-                                    thumbnailHtml = `<div class="post-thumbnail"><img src="${slide.thumbnail}" alt="${slide.title}"></div>`;
+                                    thumbnailHtml = `
+                                <div class="post-thumbnail position-absolute top-0 start-0 w-100 h-100">
+                                    <a href="${slide.permalink}" class="d-block h-100">
+                                        <img src="${slide.thumbnail}" 
+                                            alt="${slide.title}" 
+                                            class="img-fluid rounded-start w-100 h-100 object-fit-cover"
+                                            style="aspect-ratio: 4/3;">
+                                    </a>
+                                </div>`;
                                 }
 
-                                // Добавляем truncated excerpt с градиентом
                                 const truncatedExcerpt = createTruncatedExcerpt(slide.excerpt, excerptLength);
 
                                 swiper.appendSlide(`
-                                <div class="swiper-slide d-flex align-items-stretch">
-                                    <div class="card shadow-sm">
-                                        <a href="${slide.permalink}">
-                                            ${thumbnailHtml}
-                                        </a>
-                                        <div class="card-body post-excerpt">
-                                            <h3 class="card-title"><a href="${slide.permalink}" class="text-decoration-none text-black">${slide.title}</a></h3>
-                                            <div class="card-text small">
-                                                ${truncatedExcerpt}
-                                            </div>
-                                            <div class="post-read-more">
-                                                <a href="${slide.permalink}" class="text-secondary card-link">Читать далее</a>
+                                    <div class="swiper-slide">
+                                        <div class="card mb-3 shadow-sm h-100">
+                                            <div class="row g-0 h-100">
+                                                <div class="col-md-4 position-relative">
+                                                    ${thumbnailHtml}
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div class="card-body d-flex flex-column h-100">
+                                                        <p class="card-title lead">
+                                                            <a href="${slide.permalink}" class="text-decoration-none text-black">
+                                                                ${slide.title}
+                                                            </a>
+                                                        </p>
+                                                        <div class="card-text small flex-grow-1">
+                                                            ${truncatedExcerpt}
+                                                        </div>
+                                                        <div class="post-read-more mt-auto">
+                                                            <a href="${slide.permalink}" class="text-secondary card-link">
+                                                                Читать далее
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
                                 `);
                             });
 

@@ -99,33 +99,43 @@ function category_swiper_shortcode($atts) {
             <div id="<?php echo esc_attr($swiper_id); ?>" class="swiper">
                 <div class="swiper-wrapper">
 					<?php while ($query->have_posts()) : $query->the_post(); ?>
-                        <div class="swiper-slide d-flex align-items-stretch">
-                            <div class="card shadow-sm">
-								<?php if (has_post_thumbnail()) : ?>
-                                    <div class="post-thumbnail">
-                                        <a href="<?php the_permalink(); ?>">
-										    <?php the_post_thumbnail('thumbinal'); ?>
-                                        </a>
-                                    </div>
-								<?php endif; ?>
-								<div class="card-body post-excerpt">
-									<h3 class="card-title">
-										<a href="<?php the_permalink(); ?>" class="text-decoration-none text-black">
-											<?php the_title(); ?>
-										</a>
-									</h3>
-									<div class="card-text small">
-										<?php echo custom_excerpt_with_gradient(intval($atts['excerpt_length'])); ?>
-									</div>
-									<div class="post-read-more">
-										<a href="<?php the_permalink(); ?>" class="text-secondary card-link">Читать далее</a>
+					<div class="swiper-slide">
+						<div class="card mb-3 shadow-sm h-100">
+							<div class="row g-0 h-100">
+								<div class="col-md-4 position-relative">
+									<?php if (has_post_thumbnail()) : ?>
+										<div class="post-thumbnail position-absolute top-0 start-0 w-100 h-100">
+											<a href="<?php the_permalink(); ?>" class="d-block h-100">
+												<?php 
+												the_post_thumbnail('thumbinal', [
+													'class' => 'img-fluid rounded-start w-100 h-100 object-fit-cover',
+													'style' => 'aspect-ratio: 4/3;'
+												]); 
+												?>
+											</a>
+										</div>
+									<?php endif; ?>
+								</div>
+								<div class="col-md-8">
+									<div class="card-body d-flex flex-column h-100">
+										<p class="card-title lead">
+											<a href="<?php the_permalink(); ?>" class="text-decoration-none text-black">
+												<?php the_title(); ?>
+											</a>
+										</p>
+										<div class="card-text small flex-grow-1">
+											<?php echo custom_excerpt_with_gradient(intval($atts['excerpt_length'])); ?>
+										</div>
+										<div class="post-read-more mt-auto">
+											<a href="<?php the_permalink(); ?>" class="text-secondary card-link">Читать далее</a>
+										</div>
 									</div>
 								</div>
-                            </div>
-                        </div>
+							</div>
+						</div>
+					</div>
 					<?php endwhile; ?>
                 </div>
-                <div class="swiper-pagination"></div>
                 <div class="swiper-button-next bg-white rounded-circle shadow d-flex align-items-center justify-content-center"></div>
                 <div class="swiper-button-prev bg-white rounded-circle shadow d-flex align-items-center justify-content-center"></div>
             </div>

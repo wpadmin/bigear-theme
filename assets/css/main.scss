@@ -109,3 +109,134 @@
     opacity: 0;
     pointer-events: none;
 }
+
+/**
+ *  CSS стили для книг
+ */
+/* Дополнительные стили для книжной полки с Bootstrap 5.3 */
+
+/* Стили для книг */
+.book-wrapper {
+    perspective: 1000px;
+    height: 200px;
+    margin-bottom: 30px;
+}
+
+.book {
+    transform-style: preserve-3d;
+    position: relative;
+    height: 100%;
+    transition: transform 0.5s ease;
+}
+
+.book-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+}
+
+.book-cover {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform: translateZ(10px);
+    backface-visibility: hidden;
+    overflow: hidden;
+    background-color: #f8f9fa;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.book-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.book-spine {
+    position: absolute;
+    width: 20px;
+    height: 100%;
+    left: -10px;
+    background-color: rgba(0, 0, 0, 0.1);
+    transform: rotateY(-90deg) translateZ(50%);
+    transform-origin: right;
+    border-radius: 2px 0 0 2px;
+}
+
+.book-side {
+    position: absolute;
+    width: 100%;
+    height: 15px;
+    bottom: -7.5px;
+    background-color: #f8f9fa;
+    transform: rotateX(90deg) translateZ(50%);
+    transform-origin: top;
+    border: 1px solid rgba(0, 0, 0, 0.075);
+}
+
+.book-title {
+    color: #212529;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Эффект при наведении */
+.book:hover {
+    transform: translateY(-15px) rotateX(5deg) rotateY(-20deg);
+    z-index: 10;
+}
+
+.book:hover .book-title {
+    opacity: 1;
+}
+
+/* Книжная полка */
+.bookshelf {
+    height: 15px;
+    background: linear-gradient(to bottom, #8b5e3c 0%, #6d4c33 100%);
+    width: 95%;
+    border-radius: 2px;
+    position: relative;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.bookshelf::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 8px;
+    background: #a47e5a;
+    top: -8px;
+    left: 0;
+    border-radius: 2px 2px 0 0;
+}
+
+.bookshelf::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 5%;
+    width: 90%;
+    height: 10px;
+    background: rgba(0, 0, 0, 0.1);
+    filter: blur(5px);
+    border-radius: 50%;
+}
+
+/* Адаптивные настройки */
+@media (max-width: 767.98px) {
+    .book-wrapper {
+        height: 180px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .book-wrapper {
+        height: 160px;
+    }
+
+    .bookshelf {
+        width: 100%;
+    }
+}
