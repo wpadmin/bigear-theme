@@ -23,7 +23,7 @@ function register_ajax_search_scripts() {
         array(
             'ajax_url' => admin_url('admin-ajax.php'),
             'ajax_nonce' => wp_create_nonce('ajax_search_nonce'),
-            'min_chars' => 2, // Минимальное количество символов для начала поиска
+            'min_chars' => 3, // Минимальное количество символов для начала поиска
         )
     );
 }
@@ -48,9 +48,9 @@ function ajax_search_handler() {
     // Выполняем поиск
     $args = array(
         's' => $search_query,
-        'post_type' => 'any', // Можно ограничить типами записей
+        'post_type' => 'post', // Можно ограничить типами записей или 'any'
         'post_status' => 'publish',
-        'posts_per_page' => 5, // Ограничиваем количество результатов
+        'posts_per_page' => 8, // Ограничиваем количество результатов
     );
     
     $search_query = new WP_Query($args);
@@ -94,7 +94,7 @@ add_action('wp_ajax_ajax_search', 'ajax_search_handler'); // Для автори
 add_action('wp_ajax_nopriv_ajax_search', 'ajax_search_handler'); // Для неавторизованных пользователей
 
 /**
- * Обновленная функция формы поиска для меню
+ * Функция формы поиска для меню
  */
 function ajax_search_form() {
     ?>
@@ -113,30 +113,3 @@ function ajax_search_form() {
     </div>
     <?php
 }
-
-
-/**
- * Добавляем базовые стили для AJAX-поиска
- */
-function ajax_search_styles() {
-    ?>
-    <style>
-        .ajax-search-results {
-            padding: 10px;
-            border: 1px solid rgba(0,0,0,.125);
-        }
-        .search-result-card {
-            transition: background-color 0.2s ease;
-        }
-        .search-result-card:hover {
-            background-color: rgba(0,0,0,.03);
-        }
-        .no-results-message {
-            padding: 20px;
-            text-align: center;
-            color: #6c757d;
-        }
-    </style>
-    <?php
-}
-add_action('wp_head', 'ajax_search_styles');

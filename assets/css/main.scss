@@ -68,3 +68,25 @@
 .volume-slider {
     width: 80px;
 }
+
+/**
+ * Добавляем базовые стили для AJAX-поиска
+ */
+.ajax-search-results {
+    padding: 10px;
+    border: 1px solid rgba(0, 0, 0, .125);
+}
+
+.search-result-card {
+    transition: background-color 0.2s ease;
+}
+
+.search-result-card:hover {
+    background-color: rgba(0, 0, 0, .03);
+}
+
+.no-results-message {
+    padding: 20px;
+    text-align: center;
+    color: #6c757d;
+}
