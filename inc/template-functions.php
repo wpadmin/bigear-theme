@@ -387,3 +387,144 @@ function bigear_count_published_posts($args = array(), $thousands_sep = ' ', $de
     // Возвращение неформатированного количества
     return $count;
 }
+
+
+/**
+ * Функция для вывода книжной полки с книгами по указанным параметрам
+ * 
+ * @param string $title Заголовок блока
+ * @param array $query_args Аргументы запроса WP_Query
+ * @param int $max_books Максимальное количество книг для отображения
+ * @return void
+ */
+function display_book_shelf($title, $query_args, $max_books = 6) {
+    // Добавляем лимит на количество книг
+    $query_args['posts_per_page'] = $max_books;
+    
+    // Выполняем запрос
+    $books_query = new WP_Query($query_args);
+    
+    if ($books_query->have_posts()) :
+    ?>
+        <section class="book-shelf-section py-5">
+            <div class="container">
+                <h2 class="text-center mb-4 h1"><?php echo esc_html($title); ?></h2>
+                
+                <div class="bookshelf-container position-relative mb-5">
+                    <div class="row justify-content-center gx-4 gy-5 mb-4">
+                        <?php while ($books_query->have_posts()) : $books_query->the_post(); ?>
+                            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                                <div class="book-wrapper position-relative">
+                                    <a href="<?php the_permalink(); ?>" class="book d-block text-decoration-none" title="<?php the_title_attribute(); ?>">
+                                        <div class="book-inner">
+                                            <div class="book-cover shadow rounded">
+                                                <?php if (has_post_thumbnail()) : ?>
+                                                    <?php the_post_thumbnail('medium', array('class' => 'img-fluid rounded')); ?>
+                                                <?php else : ?>
+                                                    <img src="<?php echo get_template_directory_uri(); ?>/images/default-book.jpg" alt="<?php the_title_attribute(); ?>" class="img-fluid rounded">
+                                                <?php endif; ?>
+                                            </div>
+                                            <div class="book-spine"></div>
+                                            <div class="book-side"></div>
+                                        </div>
+                                        <p class="book-title small text-center mt-2 text-truncate" data-bs-toggle="tooltip" data-bs-placement="bottom" title="<?php the_title_attribute(); ?>">
+                                            <?php the_title(); ?>
+                                        </p>
+                                    </a>
+                                </div>
+                            </div>
+                        <?php endwhile; ?>
+                    </div>
+                    <div class="bookshelf position-relative mx-auto"></div>
+                </div>
+            </div>
+        </section>
+    <?php
+    endif;
+    
+    // Сбрасываем данные запроса
+    wp_reset_postdata();
+}
+
+
+					// Похожие книги
+function display_all_book_shelves() {
+    // Только если это тип записи, где нужны книжные полки
+    if (!is_singular('book') && !is_singular('post')) {
+        return;
+    }
+    
+    $current_post_id = get_the_ID();
+    
+    // 1. Книги из той же категории (похожие книги)
+    $categories = get_the_category($current_post_id);
+    if (!empty($categories)) {
+        $category_ids = array();
+        foreach ($categories as $category) {
+            $category_ids[] = $category->term_id;
+        }
+        
+        $related_args = array(
+            'category__in' => $category_ids,
+            'post__not_in' => array($current_post_id),
+            'orderby' => 'rand'
+        );
+        
+        display_book_shelf('Похожие книги', $related_args);
+    }
+    
+    // 2. Книги того же автора (теги)
+    $post_tags = get_the_tags($current_post_id);
+    if (!empty($post_tags)) {
+        $tag_ids = array();
+        foreach ($post_tags as $tag) {
+            $tag_ids[] = $tag->term_id;
+        }
+        
+        $author_args = array(
+            'tag__in' => $tag_ids,
+            'post__not_in' => array($current_post_id),
+            'orderby' => 'date',
+            'order' => 'DESC'
+        );
+        
+        display_book_shelf('Ещё книги этого автора', $author_args);
+    }
+    
+    // 3. Книги из той же серии (если таксономия существует и назначена)
+    if (taxonomy_exists('book_series') && has_term('', 'book_series', $current_post_id)) {
+        $series_terms = get_the_terms($current_post_id, 'book_series');
+        if (!empty($series_terms)) {
+            $series_ids = array();
+            foreach ($series_terms as $term) {
+                $series_ids[] = $term->term_id;
+            }
+            
+            $series_args = array(
+                'post__not_in' => array($current_post_id),
+                'tax_query' => array(
+                    array(
+                        'taxonomy' => 'book_series',
+                        'field' => 'term_id',
+                        'terms' => $series_ids
+                    )
+                ),
+                'orderby' => 'menu_order',
+                'order' => 'ASC'
+            );
+            
+            // Получаем название серии для заголовка
+            $series_name = $series_terms[0]->name;
+            display_book_shelf("Книги из серии «{$series_name}»", $series_args);
+        }
+    }
+}
+
+
+// Хук для добавления книжных полок после содержимого записи
+add_action('the_content', function($content) {
+    ob_start();
+    display_all_book_shelves();
+    $shelves = ob_get_clean();
+    return $content . $shelves;
+});
