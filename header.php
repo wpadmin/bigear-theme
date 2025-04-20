@@ -91,36 +91,8 @@ $all_posts = bigear_count_published_posts();
 			</div>
 		</div>
 
-        <nav id="site-navigation" class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="container">
-                <!-- Brand/Logo можно добавить здесь -->
-                <!-- <a class="navbar-brand" href="<?php echo esc_url(home_url('/')); ?>">
-                <?php bloginfo('name'); ?>
-                </a> -->
-
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarPrimary"
-                        aria-controls="navbarPrimary" aria-expanded="false" aria-label="<?php esc_attr_e('Toggle navigation', 'bigear'); ?>">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-<?php //get_template_part('template-parts/search-filters'); ?>
-                <div class="collapse navbar-collapse" id="navbarPrimary">
-					<?php
-					wp_nav_menu(
-						array(
-							'theme_location'  => 'primary',
-							'menu_id'         => 'primary-menu',
-							'container'       => false, // Убираем дополнительный div
-							'menu_class'      => 'navbar-nav ms-auto mb-2 mb-lg-0', // Bootstrap 5 классы
-							'fallback_cb'     => '__return_false',
-							'items_wrap'      => '<ul id="%1$s" class="%2$s">%3$s</ul>',
-							'depth'           => 2,
-							'walker'          => new Bootstrap_5_Nav_Walker() // Требуется дополнительный класс Walker
-						)
-					);
-					?>
-                </div>
-            </div>
-        </nav><!-- #site-navigation -->
+		<!-- Bootstrap Меню -->
+ 		<?php bootstrap_navbar_menu(); ?>
 
 		<div class="container mt-3">
 			<!--Хлебные крошки -->

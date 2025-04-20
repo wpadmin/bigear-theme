@@ -66,4 +66,4 @@ require get_template_directory() . '/inc/bootstrap_nav_walker.php';
 /**
  * Ajax Search.
  */
-//require get_template_directory() . '/inc/ajax-search.php';
+require get_template_directory() . '/inc/ajax-search.php';

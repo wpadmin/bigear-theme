@@ -1,110 +1,142 @@
 <?php
-// Register Ajax handlers
-add_action('wp_ajax_bigear_ajax_search', 'bigear_handle_ajax_search');
-add_action('wp_ajax_nopriv_bigear_ajax_search', 'bigear_handle_ajax_search');
+/**
+ * AJAX-поиск для WordPress с автозаполнением и карточками результатов
+ */
 
-// Enqueue necessary scripts
-function bigear_enqueue_search_scripts() {
+/**
+ * Функция для регистрации скриптов AJAX-поиска
+ */
+function register_ajax_search_scripts() {
+    // Регистрируем и подключаем JS-скрипт для AJAX-поиска
     wp_enqueue_script(
-        'bigear-ajax-search',
+        'ajax-search-script',
         get_template_directory_uri() . '/assets/js/ajax-search.js',
         array('jquery'),
-        '1.0.0',
+        '1.0',
         true
     );
-
-    wp_localize_script('bigear-ajax-search', 'bigearAjax', array(
-        'ajaxurl' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('bigear_search_nonce')
-    ));
-}
-add_action('wp_enqueue_scripts', 'bigear_enqueue_search_scripts');
-
-// Handle Ajax search requests
-function bigear_handle_ajax_search() {
-    check_ajax_referer('bigear_search_nonce', 'security');
-
-    $search = sanitize_text_field($_POST['search']);
-    $author = intval($_POST['author']);
-    $year = intval($_POST['year']);
-    $suggestions = isset($_POST['suggestions']) ? filter_var($_POST['suggestions'], FILTER_VALIDATE_BOOLEAN) : false;
-
-    $args = array(
-        'post_type' => 'post',
-        'post_status' => 'publish',
-        'posts_per_page' => $suggestions ? 5 : 10,
-        's' => $search
+    
+    // Передаем данные в JavaScript
+    wp_localize_script(
+        'ajax-search-script',
+        'ajax_search_params',
+        array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'ajax_nonce' => wp_create_nonce('ajax_search_nonce'),
+            'min_chars' => 2, // Минимальное количество символов для начала поиска
+        )
     );
+}
+add_action('wp_enqueue_scripts', 'register_ajax_search_scripts');
 
-    if ($author) {
-        $args['author'] = $author;
+/**
+ * Обработчик AJAX-запроса для поиска
+ */
+function ajax_search_handler() {
+    // Проверяем nonce для безопасности
+    check_ajax_referer('ajax_search_nonce', 'security');
+    
+    // Получаем поисковый запрос
+    $search_query = isset($_POST['search_query']) ? sanitize_text_field($_POST['search_query']) : '';
+    
+    // Проверяем длину запроса
+    if (strlen($search_query) < 2) {
+        wp_send_json_error(array('message' => 'Запрос слишком короткий'));
+        wp_die();
     }
-
-    if ($year) {
-        $args['date_query'] = array(
-            array(
-                'year' => $year
-            )
-        );
-    }
-
-    $query = new WP_Query($args);
-
-    if ($suggestions) {
-        $suggestions_array = array();
-        if ($query->have_posts()) {
-            while ($query->have_posts()) {
-                $query->the_post();
-                $suggestions_array[] = get_the_title();
-            }
-        }
-        wp_send_json(array('suggestions' => $suggestions_array));
-    } else {
-        ob_start();
-        if ($query->have_posts()) {
-            echo '<div class="row row-cols-1 row-cols-md-2 g-4">';
-            while ($query->have_posts()) {
-                $query->the_post();
-                ?>
-                <div class="col">
-                    <div class="card h-100">
-                        <?php if (has_post_thumbnail()): ?>
-                            <img src="<?php the_post_thumbnail_url('medium'); ?>" class="card-img-top" alt="<?php the_title_attribute(); ?>">
-                        <?php endif; ?>
-                        <div class="card-body">
-                            <h5 class="card-title"><?php the_title(); ?></h5>
-                            <p class="card-text"><?php echo wp_trim_words(get_the_excerpt(), 20); ?></p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted"><?php echo get_the_date(); ?></small>
-                                <a href="<?php the_permalink(); ?>" class="btn btn-primary btn-sm">Read More</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <?php
-            }
-            echo '</div>';
+    
+    // Выполняем поиск
+    $args = array(
+        's' => $search_query,
+        'post_type' => 'any', // Можно ограничить типами записей
+        'post_status' => 'publish',
+        'posts_per_page' => 5, // Ограничиваем количество результатов
+    );
+    
+    $search_query = new WP_Query($args);
+    $results = array();
+    
+    if ($search_query->have_posts()) {
+        while ($search_query->have_posts()) {
+            $search_query->the_post();
             
-            // Pagination
-            $total_pages = $query->max_num_pages;
-            if ($total_pages > 1) {
-                echo '<div class="pagination justify-content-center mt-4">';
-                echo paginate_links(array(
-                    'total' => $total_pages,
-                    'current' => max(1, get_query_var('paged')),
-                    'prev_text' => '&laquo;',
-                    'next_text' => '&raquo;',
-                    'type' => 'list',
-                    'end_size' => 3,
-                    'mid_size' => 3
-                ));
-                echo '</div>';
+            // Получаем миниатюру
+            $thumbnail = get_the_post_thumbnail_url(get_the_ID(), 'thumbnail');
+            if (!$thumbnail) {
+                $thumbnail = get_template_directory_uri() . '/images/no-image.jpg'; // Заглушка если нет миниатюры
             }
-        } else {
-            echo '<div class="alert alert-info">No posts found matching your criteria.</div>';
+            
+            // Формируем результат
+            $results[] = array(
+                'id' => get_the_ID(),
+                'title' => get_the_title(),
+                'excerpt' => wp_trim_words(get_the_excerpt(), 10), // Обрезаем текст до 10 слов
+                'url' => get_permalink(),
+                'thumbnail' => $thumbnail,
+                'post_type' => get_post_type(),
+                'date' => get_the_date('j F Y'),
+            );
         }
         wp_reset_postdata();
         
-        wp_send_json(array('html' => ob_get_clean()));
+        wp_send_json_success(array(
+            'results' => $results,
+            'count' => count($results),
+            'message' => sprintf(_n('%s результат найден', '%s результатов найдено', count($results), 'text-domain'), count($results))
+        ));
+    } else {
+        wp_send_json_error(array('message' => 'Ничего не найдено'));
     }
+    
+    wp_die();
 }
+add_action('wp_ajax_ajax_search', 'ajax_search_handler'); // Для авторизованных пользователей
+add_action('wp_ajax_nopriv_ajax_search', 'ajax_search_handler'); // Для неавторизованных пользователей
+
+/**
+ * Обновленная функция формы поиска для меню
+ */
+function ajax_search_form() {
+    ?>
+    <div class="search-container position-relative">
+        <form class="ajax-search-form d-flex" role="search">
+            <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Search" name="s" id="ajax-search-input" autocomplete="off">
+            <button class="btn btn-outline-success" type="submit">
+                <span class="search-text">Поиск</span>
+                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+            </button>
+        </form>
+        <!-- Контейнер для результатов поиска -->
+        <div class="ajax-search-results position-absolute w-100 bg-white shadow-sm rounded d-none" style="z-index: 1050; max-height: 400px; overflow-y: auto;">
+            <!-- Сюда будут добавлены результаты поиска через JavaScript -->
+        </div>
+    </div>
+    <?php
+}
+
+
+/**
+ * Добавляем базовые стили для AJAX-поиска
+ */
+function ajax_search_styles() {
+    ?>
+    <style>
+        .ajax-search-results {
+            padding: 10px;
+            border: 1px solid rgba(0,0,0,.125);
+        }
+        .search-result-card {
+            transition: background-color 0.2s ease;
+        }
+        .search-result-card:hover {
+            background-color: rgba(0,0,0,.03);
+        }
+        .no-results-message {
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+        }
+    </style>
+    <?php
+}
+add_action('wp_head', 'ajax_search_styles');
