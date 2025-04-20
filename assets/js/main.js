@@ -159,3 +159,39 @@ document.addEventListener('DOMContentLoaded', function () {
 
     console.log('Инициализация аудиоплеера завершена успешно');
 });
+
+
+// Оверлей с спиннером загрузки Bootstrap
+document.addEventListener('DOMContentLoaded', function () {
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const showSpinnerBtn = document.getElementById('showSpinnerBtn');
+
+    // Функция для показа спиннера
+    function showSpinner() {
+        loadingOverlay.classList.remove('hidden');
+    }
+
+    // Функция для скрытия спиннера
+    function hideSpinner() {
+        loadingOverlay.classList.add('hidden');
+    }
+
+    // Автоматически скрыть спиннер через 5 секунд для случаев с медленным интернетом
+    const maxLoadingTime = 5000; // 5 секунд
+
+    const loadingTimer = setTimeout(() => {
+        hideSpinner();
+    }, maxLoadingTime);
+
+    // Скрыть спиннер когда страница полностью загружена
+    window.addEventListener('load', function () {
+        clearTimeout(loadingTimer); // Очистим таймер, если страница загрузилась быстрее
+        hideSpinner();
+    });
+
+    // Кнопка для демонстрации работы спиннера
+    showSpinnerBtn.addEventListener('click', function () {
+        showSpinner();
+        setTimeout(hideSpinner, 2000); // Скрыть через 2 секунды для демонстрации
+    });
+});

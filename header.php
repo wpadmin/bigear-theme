@@ -29,7 +29,14 @@ $all_posts = bigear_count_published_posts();
 <?php wp_body_open(); ?> 
 <div id="page" class="site">
 	<a class="skip-link screen-reader-text" href="#primary"><?php esc_html_e( 'Skip to content', 'bigear' ); ?></a>
-
+    
+	<!-- Оверлей с спиннером загрузки используя классы Bootstrap -->
+    <div class="overlay d-flex justify-content-center align-items-center" id="loadingOverlay">
+        <div class="spinner-grow text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+    </div>
+	
 	<header id="masthead" class="site-header">
 
 		<div class="d-flex justify-content-center align-items-center">
