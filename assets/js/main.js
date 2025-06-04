@@ -6,6 +6,12 @@ import Popover from 'bootstrap/js/dist/popover';
 import Dropdown from 'bootstrap/js/dist/dropdown'; // Добавляем для выпадающих меню
 import Offcanvas from 'bootstrap/js/dist/offcanvas'; // Добавляем для мобильного меню
 
+import { scrollMenu } from './menuScroll.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+    scrollMenu();
+});
+
 // Инициализация Bootstrap
 document.addEventListener('DOMContentLoaded', () => {
     try {
