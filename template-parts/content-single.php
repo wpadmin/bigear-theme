@@ -65,24 +65,40 @@
 
             // Вывод метаданных в цикле
             foreach ($meta_fields as $key => $field) {
-                if (isset($all_meta[$key][0])) {
-                    $value = $all_meta[$key][0];
-                    
-                    if ($field['type'] === 'text') {
-                        printf(
-                            '<p class="mb-1"><strong>%s:</strong> %s</p>',
-                            esc_html($field['label']),
-                            esc_html($value)
-                        );
-                    } elseif ($field['type'] === 'button' && !empty($value)) {
-                        printf(
-                            '<a href="%s" class="%s" target="_blank">%s</a>',
-                            esc_url($value),
-                            esc_attr($field['class']),
-                            esc_html($field['label'])
-                        );
-                    }
-                }
+	            if (isset($all_meta[$key][0])) {
+		            $value = $all_meta[$key][0];
+
+		            if ($field['type'] === 'text') {
+			            printf(
+				            '<p class="mb-1"><strong>%s:</strong> %s</p>',
+				            esc_html($field['label']),
+				            esc_html($value)
+			            );
+		            } elseif ($field['type'] === 'button' && !empty($value)) {
+			            // Параметры для добавления
+			            $utm_params = [
+				            'utm_source' => 'advcake',
+				            'utm_medium' => 'cpa',
+				            'utm_campaign' => 'affiliate',
+				            'utm_content' => 'd13fb582',
+				            'advcake_params' => '',
+				            'utm_term' => '',
+				            'erid' => '2VfnxyNkZrY',
+				            'advcake_method' => '1',
+				            'm' => '1'
+			            ];
+
+			            // Добавляем параметры к URL
+			            $url_with_utm = add_query_arg($utm_params, $value);
+
+			            printf(
+				            '<a href="%s" class="%s" target="_blank">%s</a>',
+				            esc_url($url_with_utm),
+				            esc_attr($field['class']),
+				            esc_html($field['label'])
+			            );
+		            }
+	            }
             }
 
             // Ссылка на фрагмент
