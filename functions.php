@@ -61,9 +61,14 @@ require get_template_directory() . '/inc/category-swiper.php';
 /**
  *Bootstrap 5 Nav Walker.
  */
-require get_template_directory() . '/inc/bootstrap_nav_walker.php';
+require get_template_directory() . '/inc/bootstrap-nav-walker.php';
 
 /**
  * Ajax Search.
  */
 require get_template_directory() . '/inc/ajax-search.php';
+
+/**
+ *Bootstrap 5 Nav Walker.
+ */
+require get_template_directory() . '/inc/bootstrap-categories-widget.php';
