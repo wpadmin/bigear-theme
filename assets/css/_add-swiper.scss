@@ -1,10 +1,32 @@
-// Стили для контейнера Swiper
+// Основной контейнер слайдера категорий
 .category-swiper-container {
   margin-bottom: 40px;
 
-  // Плавный переход для изменения высоты контейнера
+  // Настройки Swiper
   .swiper {
     transition: height 0.3s ease;
+
+    // Обеспечиваем одинаковую высоту слайдов
+    &-wrapper {
+      align-items: stretch;
+    }
+
+    &-slide {
+      height: auto !important;
+      display: flex;
+      flex-direction: column;
+
+      // Карточка занимает всю доступную высоту
+      .card {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+
+        .row {
+          flex: 1;
+        }
+      }
+    }
   }
 
   // Стили для миниатюр
@@ -48,35 +70,53 @@
         left: 0;
         width: 100%;
         height: 30px;
-        background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 90%);
+        background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 1) 90%);
         pointer-events: none; // Чтобы не мешал кликам
       }
     }
   }
 
-  // Настройка навигационных стрелок
-  .swiper-button-next,
-  .swiper-button-prev {
-    transition: opacity 0.3s ease;
+  // Навигационные кнопки
+  .swiper-button {
 
-    &.loading {
-      opacity: 0.5;
+    &-next,
+    &-prev {
+      width: 50px !important;
+      height: 50px !important;
+      transition: opacity 0.3s ease;
 
-      // Добавляем анимированные точки загрузки
+      // Стилизация стрелок
       &:after {
-        content: "...";
-        animation: loading-dots 1.5s infinite;
+        font-size: 18px !important;
+        color: var(--bs-dark);
+        margin: 0;
+      }
+
+      // Состояние загрузки
+      &.loading {
+        opacity: 0.5;
+
+        &:after {
+          content: "...";
+          animation: loading-dots 1.5s infinite;
+        }
       }
     }
   }
 
-  // Настройка пагинации
-  .swiper-pagination-bullet-active {
-    background-color: var(--bs-primary);
+  // Пагинация
+  .swiper-pagination {
+    &-bullet {
+      &-active {
+        background-color: var(--bs-primary);
+      }
+    }
   }
 }
 
-// Анимация точек загрузки
+// Анимации
 @keyframes loading-dots {
   0% {
     opacity: 0.2;
@@ -91,23 +131,30 @@
   }
 }
 
-/* Стилизация кнопок навигации Swiper */
-.swiper-button-next,
-.swiper-button-prev {
-  /* Основные размеры и форма */
-  width: 50px !important;
-  height: 50px !important;
+// Дополнительные стили для выравнивания карточек
+.card-body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .card-text {
+    flex-grow: 1;
+  }
+
+  .post-read-more {
+    margin-top: auto;
+  }
 }
 
-/* Стилизация самих стрелок (иконок) */
-.swiper-button-next:after,
-.swiper-button-prev:after {
-  /* Уменьшаем размер стрелок */
-  font-size: 18px !important;
-
-  /* Меняем цвет стрелок на черный */
-  color: var(--bs-dark);
-
-  /* Удаляем отступы, чтобы стрелка была по центру круга */
-  margin: 0;
+// Адаптивность
+@media (max-width: 767.98px) {
+  .category-swiper-container {
+    .swiper-slide {
+      .card {
+        .row {
+          flex-direction: column;
+        }
+      }
+    }
+  }
 }

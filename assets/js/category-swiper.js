@@ -115,7 +115,7 @@
                                 const truncatedExcerpt = createTruncatedExcerpt(slide.excerpt, excerptLength);
 
                                 swiper.appendSlide(`
-                                    <div class="swiper-slide">
+                                    <div class="swiper-slide h-100">
                                         <div class="card mb-3 shadow-sm h-100">
                                             <div class="row g-0 h-100">
                                                 <div class="col-md-4 position-relative">
